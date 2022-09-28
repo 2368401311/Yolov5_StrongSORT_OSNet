@@ -1,5 +1,5 @@
 import argparse
-
+import csv
 import os
 # limit the number of cpus used by high performance libraries
 os.environ["OMP_NUM_THREADS"] = "1"
@@ -71,6 +71,7 @@ def run(
         half=False,  # use FP16 half-precision inference
         dnn=False,  # use OpenCV DNN for ONNX inference
         eval=False,  # run multi-gpu eval
+        headercount=0
 ):
 
     source = str(source)
@@ -225,9 +226,15 @@ def run(
                             bbox_w = output[2] - output[0]
                             bbox_h = output[3] - output[1]
                             # Write MOT compliant results to file
-                            with open(txt_path + '.txt', 'a') as f:
-                                f.write(('%g ' * 10 + '\n') % (frame_idx + 1, id, bbox_left,  # MOT format
-                                                               bbox_top, bbox_w, bbox_h, -1, -1, -1, i))
+                            with open(txt_path + '.csv', 'a') as f:
+                                writer = csv.writer(f)
+                                header = ['frame', 'person_id', 'confi','class']
+                                data = [frame_idx+1, id, conf_percentage, cls ]
+                                #print(data)
+                                if headercount ==0:
+                                  writer.writerow(header)
+                                writer.writerow(data)
+                                headercount = headercount +1
 
                         if save_vid or save_crop or show_vid:  # Add bbox to image
                             c = int(cls)  # integer class
