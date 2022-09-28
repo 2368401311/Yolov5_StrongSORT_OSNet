@@ -218,7 +218,7 @@ def run(
                         bboxes = output[0:4]
                         id = output[4]
                         cls = output[5]
-
+                        conf_percentage = round(conf.item(),3)
                         if save_txt:
                             # to MOT format
                             bbox_left = output[0]
